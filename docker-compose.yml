@@ -1,0 +1,164 @@
+# =============================================================================
+# VISIT COUNTER API - Docker Compose Configuration
+# =============================================================================
+# Container per API contatore visite embeddabile multi-sito
+# Include configurazione per reverse proxy con Nginx Proxy Manager
+
+services:
+  visit-counter:
+    # Build del container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    
+    # Nome container
+    container_name: visit-counter-api
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Porte esposte
+    ports:
+      - "3000:3000"  # API porta principale
+    
+    # Rete condivisa con Nginx Proxy Manager
+    networks:
+      - nginx-proxy-network
+    
+    # Variables d'ambiente
+    environment:
+      # Configurazione base
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      
+      # Rate limiting
+      - RATE_LIMIT_WINDOW_MS=900000
+      - RATE_LIMIT_MAX_REQUESTS=1000
+      
+      # Configurazione opzionale
+      - TZ=Europe/Rome
+      - LOG_LEVEL=info
+    
+    # Volumi per persistenza dati e sviluppo
+    volumes:
+      # Codice applicazione (bind mount per sviluppo)
+      - ./volumes/ws:/app
+      
+      # Node modules (volume anonimo per performance)
+      - /app/node_modules
+      
+      # Data storage per contatori
+      - ./data:/app/data
+      
+      # Log (opzionale)
+      - ./logs:/app/logs
+    
+    # Working directory
+    working_dir: /app
+    
+    # Limiti di risorse
+    deploy:
+      resources:
+        limits:
+          memory: 256M      # Limite RAM
+          cpus: '0.5'       # Limite CPU
+        reservations:
+          memory: 128M      # RAM riservata
+          cpus: '0.25'      # CPU riservata
+    
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Labels per organizzazione
+    labels:
+      # Identificazione servizio
+      - "com.docker.compose.project=visit-counter"
+      - "com.docker.compose.service=visit-counter-api"
+      
+      # Configurazione per Nginx Proxy Manager
+      - "nginx-proxy.enable=true"
+      - "nginx-proxy.port=3000"
+      - "nginx-proxy.protocol=http"
+      - "nginx-proxy.host=visits.yourdomain.com"  # Sostituire con dominio
+      
+      # Metadata
+      - "category=analytics"
+      - "description=Visit counter API for websites"
+      - "backup.enable=true"
+      - "backup.path=./data"
+
+# =============================================================================
+# RETI
+# =============================================================================
+networks:
+  nginx-proxy-network:
+    external: true
+    name: nginx-proxy-network
+
+# =============================================================================
+# VOLUMI (opzionale - usando bind mounts)
+# =============================================================================
+# volumes:
+#   visit_counter_data:
+#     driver: local
+
+# =============================================================================
+# NOTE PER LA CONFIGURAZIONE
+# =============================================================================
+#
+# 1. SETUP INIZIALE:
+#    - Creare la rete: docker network create nginx-proxy-network
+#    - Avviare: docker-compose up -d
+#    - Verificare: docker-compose ps
+#
+# 2. UTILIZZO:
+#    - Registrare sito: POST /api/register {"domain": "example.com"}
+#    - Ricevi site_key e usa: <script src="your-domain/embed/{site_key}.js"></script>
+#    - Aggiungi al HTML: <span class="visit-counter">0</span> visite
+#    - Statistiche: http://your-domain/stats/{site_key}
+#
+# 3. SICUREZZA:
+#    - Cambiare SALT in production
+#    - Usare HTTPS in produzione (Nginx Proxy Manager)
+#    - Limitare accesso al database
+#    - Rate limiting già configurato
+#
+# 4. NGINX PROXY MANAGER:
+#    - Creare Proxy Host per visits.yourdomain.com -> visit-counter-api:3000
+#    - Abilitare SSL Let's Encrypt
+#    - Configurare Force SSL
+#
+# 5. BACKUP:
+#    - Database SQLite in ./data/visits.db
+#    - Backup: tar czf visit-counter-backup.tar.gz ./data
+#    - Restore: estrarre in ./data/
+#
+# 6. MONITORAGGIO:
+#    - Health check: curl http://localhost:3000/health
+#    - Logs: docker-compose logs -f visit-counter
+#    - Stats: docker stats visit-counter-api
+#
+# 7. SCALING:
+#    - Per alto traffico: usare database esterno (PostgreSQL/MySQL)
+#    - Redis per cache e rate limiting
+#    - Load balancer per multiple istanze
+#
+# 8. ESEMPI EMBED:
+#    HTML: <script src="https://visits.domain.com/embed/SITE_KEY.js"></script>
+#          <p>Visite: <span class="visit-counter">0</span></p>
+#    
+#    WordPress: Aggiungi nel footer o widget HTML
+#    
+#    JavaScript event: 
+#    window.addEventListener('visitCounted', function(e) {
+#      console.log('Visite:', e.detail.visits);
+#    });
+#
+# =============================================================================

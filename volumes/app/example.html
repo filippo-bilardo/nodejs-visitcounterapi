@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esempio Integrazione Visit Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .counter {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px;
+            font-weight: bold;
+        }
+        .code {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🌐 Visit Counter - Esempio Integrazione</h1>
+        <p>Questa è una pagina di esempio che mostra come integrare il contatore di visite.</p>
+        
+        <h2>📊 Statistiche Attuali</h2>
+        <div>
+            <div class="counter">
+                Visite Totali: <span id="visit-counter">Caricamento...</span>
+            </div>
+            <div class="counter">
+                Visite Pagina: <span id="page-counter">Caricamento...</span>
+            </div>
+        </div>
+        
+        <h2>🔧 Codice Utilizzato</h2>
+        <div class="code">
+&lt;script src="http://localhost:3000/embed.js?domain=esempio-sito.com"&gt;&lt;/script&gt;
+
+&lt;div&gt;Visite Totali: &lt;span id="visit-counter"&gt;Caricamento...&lt;/span&gt;&lt;/div&gt;
+&lt;div&gt;Visite Pagina: &lt;span id="page-counter"&gt;Caricamento...&lt;/span&gt;&lt;/div&gt;
+        </div>
+        
+        <h2>📝 Test</h2>
+        <p>Ricarica la pagina per vedere il contatore incrementare!</p>
+        <button onclick="window.location.reload()">🔄 Ricarica Pagina</button>
+        <button onclick="VisitCounter.increment()">➕ Incrementa Manualmente</button>
+    </div>
+    
+    <!-- Integrazione Visit Counter -->
+    <script src="http://localhost:3000/embed.js?domain=esempio-sito.com"></script>
+    
+    <!-- Event listener per aggiornamenti -->
+    <script>
+        window.addEventListener('visitCounterUpdated', function(event) {
+            console.log('📊 Contatore aggiornato:', event.detail);
+            
+            // Potresti aggiungere qui logica personalizzata
+            // Es: analytics, notifiche, etc.
+        });
+        
+        // Test automatico ogni 10 secondi (solo per demo)
+        // setInterval(() => {
+        //     VisitCounter.increment();
+        // }, 10000);
+    </script>
+</body>
+</html>

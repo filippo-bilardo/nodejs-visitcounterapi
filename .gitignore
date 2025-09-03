@@ -1,0 +1,104 @@
+# =============================================================================
+# Visit Counter API - .gitignore
+# =============================================================================
+
+# Database e dati persistenti
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ma mantieni il template
+!.env.example
+
+# Backup files
+*.bak
+*.backup
+*.tar.gz
+backup-*
+visit-counter-backup-*
+
+# Docker
+.dockerignore
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# SSL certificates (se generati localmente)
+*.pem
+*.key
+*.crt
+*.cert
+
+# PM2 logs
+.pm2/
+
+# Docker volumes data (preserva solo la struttura)
+volumes/app/.env
+
+# Mantieni file di esempio ma non dati reali
+!volumes/app/.env.example
