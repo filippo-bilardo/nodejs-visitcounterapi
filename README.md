@@ -5,7 +5,10 @@ API Node.js minimale per un'API contatore di visite embeddabile multi-sito. Cons
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org)
-[![Alpine Linux](https://img.shields.io/badge/Alpine-Linux-0D597F.svg)](https://alpinelinux.org)```
+[![Alpine Linux](https://img.shields.io/badge/Alpine-Linux-0D597F.svg)](https://alpinelinux.org)
+
+
+```
 nodejs-visitcounterapi/
 ├── 📄 docker-compose.yml     # Configurazione container
 ├── 📄 Dockerfile             # Build container ottimizzato
@@ -74,7 +77,7 @@ nodejs-visitcounterapi/
 
 ```bash
 # Clone del repository
-git clone https://github.com/your-username/nodejs-visitcounterapi.git
+git clone https://github.com/filippo-bilardo/nodejs-visitcounterapi.git
 cd nodejs-visitcounterapi
 
 # Configurazione ambiente
@@ -91,10 +94,10 @@ nano volumes/app/.env  # Modifica SALT e altre configurazioni
 
 ```bash
 # Clone via HTTPS
-git clone https://github.com/your-username/nodejs-visitcounterapi.git
+git clone https://github.com/filippo-bilardo/nodejs-visitcounterapi.git
 
 # Oppure via SSH
-git clone git@github.com:your-username/nodejs-visitcounterapi.git
+git clone git@github.com:filippo-bilardo/nodejs-visitcounterapi.git
 
 # Entra nella directory
 cd nodejs-visitcounterapi
@@ -457,7 +460,7 @@ rm data/visits.db
 
 ```bash
 # Setup completo in un comando
-git clone https://github.com/your-username/nodejs-visitcounterapi.git && \
+git clone https://github.com/filippo-bilardo/nodejs-visitcounterapi.git && \
 cd nodejs-visitcounterapi && \
 cp volumes/app/.env.example volumes/app/.env && \
 chmod +x scripts/manage.sh volumes/app/*.sh && \
@@ -542,7 +545,7 @@ cd /ws/container/_nodejs
 
 ### 🐛 Segnalazione Bug
 
-- **Issues**: [Apri un issue su GitHub](https://github.com/your-username/nodejs-visitcounterapi/issues)
+- **Issues**: [Apri un issue su GitHub](https://github.com/filippo-bilardo/nodejs-visitcounterapi/issues)
 - **Template Bug Report**: Usa il template fornito
 - **Security Issues**: Contatta privatamente per problemi di sicurezza
 
@@ -557,7 +560,7 @@ cd /ws/container/_nodejs
 
 ```bash
 # Clone per sviluppo
-git clone https://github.com/your-username/nodejs-visitcounterapi.git
+git clone https://github.com/filippo-bilardo/nodejs-visitcounterapi.git
 cd nodejs-visitcounterapi
 
 # Crea branch per feature
@@ -601,9 +604,9 @@ Questo progetto è rilasciato sotto licenza **MIT License** - vedi il file [LICE
 
 ### 📈 GitHub Repository
 
-- **URL**: `https://github.com/your-username/nodejs-visitcounterapi`
-- **Clone HTTPS**: `git clone https://github.com/your-username/nodejs-visitcounterapi.git`
-- **Clone SSH**: `git clone git@github.com:your-username/nodejs-visitcounterapi.git`
+- **URL**: `https://github.com/filippo-bilardo/nodejs-visitcounterapi`
+- **Clone HTTPS**: `git clone https://github.com/filippo-bilardo/nodejs-visitcounterapi.git`
+- **Clone SSH**: `git clone git@github.com:filippo-bilardo/nodejs-visitcounterapi.git`
 
 ### 🏷️ Tags e Releases
 
