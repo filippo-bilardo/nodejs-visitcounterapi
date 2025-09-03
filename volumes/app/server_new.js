@@ -8,18 +8,9 @@ const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 require('dotenv').config();
 
-// Dashboard Controller
-const DashboardController = require('./dashboard-controller');
-// Database Manager
-const DatabaseManager = require('./database');
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
-
-// Inizializza Dashboard Controller e Database
-const dashboardController = new DashboardController();
-const dbManager = new DatabaseManager();
 
 // =============================================================================
 // MIDDLEWARE E SICUREZZA
@@ -45,7 +36,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'X-Site-Domain', 'X-Page-Path']
 }));
 
-// Rate limiting configurato per proxy
+// Rate limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minuti
     max: 1000, // Limite di 1000 richieste per IP ogni 15 minuti
@@ -54,12 +45,7 @@ const limiter = rateLimit({
         retryAfter: 15 * 60
     },
     standardHeaders: true,
-    legacyHeaders: false,
-    // Configurazione per proxy - usa l'IP dal header X-Forwarded-For
-    trustProxy: true,
-    keyGenerator: (req) => {
-        return req.ip; // Express gestisce già X-Forwarded-For con trust proxy
-    }
+    legacyHeaders: false
 });
 app.use(limiter);
 
@@ -116,26 +102,14 @@ function incrementCounter(domain, page = '/') {
 // =============================================================================
 
 // Health check
-app.get('/health', async (req, res) => {
-    try {
-        const dbHealth = await dbManager.healthCheck();
-        const sites = await dbManager.getAllSites();
-        
-        res.json({
-            status: 'OK',
-            timestamp: moment().toISOString(),
-            uptime: process.uptime(),
-            version: require('./package.json').version,
-            totalSites: sites.length,
-            database: dbHealth
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'ERROR',
-            timestamp: moment().toISOString(),
-            error: error.message
-        });
-    }
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: moment().toISOString(),
+        uptime: process.uptime(),
+        version: require('./package.json').version,
+        totalSites: siteCounters.size
+    });
 });
 
 // Endpoint principale per incrementare contatore (GET per embed semplice)
@@ -222,31 +196,38 @@ app.post('/count', [
 });
 
 // Statistiche dettagliate per un dominio
-app.get('/stats/:domain', async (req, res) => {
+app.get('/stats/:domain', (req, res) => {
     try {
         const domain = req.params.domain;
-        const stats = await dbManager.getSiteStats(domain);
+        const counter = siteCounters.get(domain);
         
-        if (!stats || stats.totalVisits === 0) {
+        if (!counter) {
             return res.status(404).json({ 
                 error: 'Dominio non trovato',
                 domain: domain 
             });
         }
         
-        // Ottieni anche i dati per date per i grafici
-        const visitsByDate = await dbManager.getVisitsByDate(domain, 30);
+        // Converti Map in oggetti per JSON
+        const dailyStats = {};
+        counter.daily.forEach((count, date) => {
+            dailyStats[date] = count;
+        });
+        
+        const pageStats = {};
+        counter.pages.forEach((count, page) => {
+            pageStats[page] = count;
+        });
         
         res.json({
             domain: domain,
-            totalVisits: stats.totalVisits,
-            visitsToday: stats.visitsToday,
-            visitsThisWeek: stats.visitsThisWeek,
-            visitsThisMonth: stats.visitsThisMonth,
-            firstVisit: stats.firstVisit,
-            lastVisit: stats.lastVisit,
-            activeDays: stats.activeDays,
-            visitsByDate: visitsByDate
+            total: counter.total,
+            firstVisit: counter.firstVisit,
+            lastVisit: counter.lastVisit,
+            dailyStats: dailyStats,
+            pageStats: pageStats,
+            totalPages: counter.pages.size,
+            activeDays: counter.daily.size
         });
         
     } catch (error) {
@@ -258,9 +239,22 @@ app.get('/stats/:domain', async (req, res) => {
 });
 
 // Lista di tutti i domini registrati
-app.get('/sites', async (req, res) => {
+app.get('/sites', (req, res) => {
     try {
-        const sites = await dbManager.getAllSites();
+        const sites = [];
+        
+        siteCounters.forEach((counter, domain) => {
+            sites.push({
+                domain: domain,
+                total: counter.total,
+                todayCount: counter.daily.get(moment().format('YYYY-MM-DD')) || 0,
+                pages: counter.pages.size,
+                lastVisit: counter.lastVisit
+            });
+        });
+        
+        // Ordina per numero di visite (decrescente)
+        sites.sort((a, b) => b.total - a.total);
         
         res.json({
             totalSites: sites.length,
@@ -490,28 +484,56 @@ app.get('/', (req, res) => {
 });
 
 // =============================================================================
+// ERROR HANDLING E STARTUP
+// =============================================================================
+
+// 404 handler
+app.use((req, res) => {
+    res.status(404).json({
+        error: 'Endpoint non trovato',
+        path: req.path,
+        method: req.method
+    });
+});
+
+// Error handler globale
+app.use((error, req, res, next) => {
+    console.error('Errore non gestito:', error);
+    res.status(500).json({
+        error: 'Errore interno del server',
+        timestamp: moment().toISOString()
+    });
+});
+
+// =============================================================================
+// ROOT ENDPOINT
+// =============================================================================
+
+// Endpoint root che reindirizza alla dashboard
+// =============================================================================
 // DASHBOARD AMMINISTRATIVA
 // =============================================================================
 
-// Dashboard principale - usa il controller
-app.get('/dashboard', 
-    DashboardController.logDashboardAccess,
-    (req, res) => dashboardController.getDashboard(req, res)
-);
-
-// Serve file statici della dashboard (CSS, JS, immagini)
-app.get('/public/:filename', (req, res) => {
-    dashboardController.serveStaticFile(req, res);
-});
-
-// API endpoint per statistiche dashboard
-app.get('/dashboard/stats', (req, res) => {
-    dashboardController.getDashboardStats(req, res);
-});
-
-// Health check specifico dashboard
-app.get('/dashboard/health', (req, res) => {
-    dashboardController.getDashboardHealth(req, res);
+// Dashboard per visualizzare statistiche di tutti i siti
+app.get('/dashboard', (req, res) => {
+    const apiUrl = `${req.protocol}://${req.get('host')}`;
+    
+    res.set('Content-Type', 'text/html');
+    res.send(`
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Visit Counter Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard Test</h1>
+    <p>API URL: ${apiUrl}</p>
+    <p>Test dashboard funzionante!</p>
+</body>
+</html>
+`);
 });
 
 // =============================================================================

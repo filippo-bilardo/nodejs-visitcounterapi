@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Visit Counter Dashboard</title>
+    <link rel="stylesheet" href="/public/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1>📊 Visit Counter Dashboard</h1>
+            <div class="header-info">
+                <span id="last-update">Ultimo aggiornamento: <span id="timestamp">--</span></span>
+                <button id="refresh-btn" class="btn btn-primary">🔄 Aggiorna</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Statistiche generali -->
+    <section class="stats-overview">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🌐</div>
+                    <div class="stat-info">
+                        <h3 id="total-sites">0</h3>
+                        <p>Siti totali</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👁️</div>
+                    <div class="stat-info">
+                        <h3 id="total-visits">0</h3>
+                        <p>Visite totali</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-info">
+                        <h3 id="visits-today">0</h3>
+                        <p>Visite oggi</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-info">
+                        <h3 id="avg-daily">0</h3>
+                        <p>Media giornaliera</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grafici -->
+    <section class="charts-section">
+        <div class="container">
+            <div class="charts-grid">
+                <!-- Grafico visite nel tempo -->
+                <div class="chart-container">
+                    <h3>📈 Visite negli ultimi 30 giorni</h3>
+                    <canvas id="visits-chart"></canvas>
+                </div>
+                
+                <!-- Grafico top siti -->
+                <div class="chart-container">
+                    <h3>🏆 Top siti per visite</h3>
+                    <canvas id="sites-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabella dettagli siti -->
+    <section class="sites-table-section">
+        <div class="container">
+            <h3>📋 Dettagli siti</h3>
+            <div class="table-controls">
+                <input type="text" id="search-input" placeholder="🔍 Cerca sito..." class="search-input">
+                <select id="sort-select" class="sort-select">
+                    <option value="visits">Ordina per visite</option>
+                    <option value="domain">Ordina per dominio</option>
+                    <option value="lastVisit">Ordina per ultima visita</option>
+                </select>
+            </div>
+            
+            <div class="table-wrapper">
+                <table id="sites-table" class="sites-table">
+                    <thead>
+                        <tr>
+                            <th>🌐 Dominio</th>
+                            <th>👁️ Visite totali</th>
+                            <th>📅 Prima visita</th>
+                            <th>🕒 Ultima visita</th>
+                            <th>📈 Visite oggi</th>
+                            <th>🔗 Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sites-table-body">
+                        <tr class="loading-row">
+                            <td colspan="6">⏳ Caricamento dati...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Caricamento dati...</p>
+        </div>
+    </div>
+
+    <!-- Modal per dettagli sito -->
+    <div id="site-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Dettagli sito</h3>
+                <span class="modal-close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modal-site-details"></div>
+                <canvas id="modal-site-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Visit Counter API - Dashboard amministrativa</p>
+            <p>API Status: <span id="api-status" class="status-indicator">🔄</span></p>
+        </div>
+    </footer>
+
+    <script src="/public/dashboard.js"></script>
+</body>
+</html>

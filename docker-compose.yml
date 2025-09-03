@@ -41,22 +41,13 @@ services:
       - TZ=Europe/Rome
       - LOG_LEVEL=info
     
-    # Volumi per persistenza dati e sviluppo
+    # Volumi per persistenza dati
     volumes:
-      # Codice applicazione (bind mount per sviluppo)
-      - ./volumes/ws:/app
-      
-      # Node modules (volume anonimo per performance)
-      - /app/node_modules
-      
       # Data storage per contatori
-      - ./data:/app/data
+      - ./volumes/data:/app/data
       
-      # Log (opzionale)
-      - ./logs:/app/logs
-    
-    # Working directory
-    working_dir: /app
+      # Log applicazione
+      - ./volumes/logs:/app/logs
     
     # Limiti di risorse
     deploy:

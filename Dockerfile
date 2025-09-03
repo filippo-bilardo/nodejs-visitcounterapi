@@ -23,7 +23,7 @@ WORKDIR /app
 COPY volumes/app/package*.json ./
 
 # Installa solo dipendenze di produzione
-RUN npm ci --only=production && \
+RUN npm install --only=production && \
     npm cache clean --force
 
 # Stage 2: Runtime container

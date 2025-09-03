@@ -28,12 +28,12 @@
     "cors": "^2.8.5",
     "helmet": "^7.0.0",
     "compression": "^1.7.4",
-    "redis": "^4.6.7",
     "dotenv": "^16.3.1",
     "express-rate-limit": "^6.10.0",
     "express-validator": "^7.0.1",
     "uuid": "^9.0.0",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "sqlite3": "^5.1.6"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
